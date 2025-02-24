@@ -30,3 +30,7 @@ Fields:
 - `repo` : the repo to be scanned
 - `token` : the Github Personal Access Token (PAT) to access the repository
 - `dry_run`: If true, no modifications are made to existing tickets. If false, the described modifications are made
+
+# Contributions
+
+Thank you to [mhl's github-issue-scripts](https://github.com/mhl/github-issues-scripts) for the initial inspiration.
