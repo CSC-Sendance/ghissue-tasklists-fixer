@@ -9,7 +9,10 @@ TOKEN = ''
 OWNER = ''
 REPO = ''
 
+# defaults for config file
 DRY_RUN = True
+REMOVE_LINKED_ITEMS = False
+
 
 INIT_FROM_FILE = True
 
@@ -18,7 +21,7 @@ if INIT_FROM_FILE:
 
         with open('config.json', 'a') as f:
             f.write(json.dumps({'token': '', 'owner': '', 'repo': '',
-                    'dry_run': False}, ensure_ascii=False, indent=4))
+                    'dry_run': DRY_RUN, 'remove_linked_items': REMOVE_LINKED_ITEMS}, ensure_ascii=False, indent=4))
         raise Exception(
             "config.json created - please fill and restart the script.")
     else:
@@ -28,6 +31,7 @@ if INIT_FROM_FILE:
             OWNER = d['owner']
             REPO = d['repo']
             DRY_RUN = d['dry_run']
+            REMOVE_LINKED_ITEMS = d['remove_linked_items']
 
 
 HEADERS = {'User-Agent': 'github-issues-fixer/1.0',
@@ -51,12 +55,12 @@ def main():
     # filtered_list = [filtered_list[0]] # only process the newest issue
 
     updated_issues = process(
-        filtered_list, '```[tasklist]\n', '\n```', 'body', replace_childlinks=True)
+        filtered_list, '```[tasklist]\n', '\n```', 'body')
 
     print(f'Updated {len(updated_issues)} issues')
 
 
-def process(issue_list, replace_start, replace_end, replacefield='body', replace_childlinks=False):
+def process(issue_list, replace_start, replace_end, replacefield='body'):
 
     for issue in issue_list:
         fieldval = issue[replacefield]
@@ -73,12 +77,11 @@ def process(issue_list, replace_start, replace_end, replacefield='body', replace
             print(f'Found {replace_start} in issue #{issue['number']}')
             before = fieldval[:start_index]
             between = fieldval[start_index+len(replace_start):stop_index]
-
-            if (replace_childlinks):
-                replaced_between, sub_issues = findandreplace_potential_subissues(
-                    between)
-                if sub_issues is not None and len(sub_issues) != 0:
-                    add_subissues(issue['number'], sub_issues)
+            replaced_between, sub_issues = findandreplace_potential_subissues(
+                between)
+            if sub_issues is not None and len(sub_issues) != 0:
+                add_subissues(issue['number'], sub_issues)
+                if (REMOVE_LINKED_ITEMS):
                     between = replaced_between
 
             after = fieldval[stop_index+len(replace_end):]

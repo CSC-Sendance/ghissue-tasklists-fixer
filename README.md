@@ -30,6 +30,7 @@ Fields:
 - `repo` : the repo to be scanned
 - `token` : the Github Personal Access Token (PAT) to access the repository
 - `dry_run`: If true, no modifications are made to existing tickets. If false, the described modifications are made
+- `remove_linked_items`: If true, tasklist items which are linked issues (e.g. #<number>) will get removed from the resulting checklist. If false, the linked item says in the resulting checklist
 
 # Contributions
 
