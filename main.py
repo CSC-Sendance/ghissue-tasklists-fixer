@@ -52,10 +52,13 @@ def main():
         f'Found {len(filtered_list)} issues with filter criteria "{filtercritera}"')
 
     # Use this if you want to limit/filter the processed issues
-    # filtered_list = [filtered_list[0]] # only process the newest issue
+    # filtered_list = [filtered_list[0]]  # only process the newest issue
 
     updated_issues = process(
-        filtered_list, '```[tasklist]\n', '\n```', 'body')
+        filtered_list, '```[tasklist]', '\n```', 'body')
+
+    # updated_issues2 = process(
+    #    filtered_list, '```[tasklist]\r\n', '\n```', 'body') # some tasks use carriage return after tasklist tag
 
     print(f'Updated {len(updated_issues)} issues')
 
@@ -169,9 +172,11 @@ def get_issueid(line, linestart):
         pathparts = line.split('/')
         issueowner = pathparts[3]
         issuerepo = pathparts[4]
+        issuestag = pathparts[5]
         issuenumber = pathparts[6]
 
-        if (issuenumber.isdecimal()):
+        # make sure we only grab issues, not assets/releases or similar
+        if (issuestag == "issues" and issuenumber.isdecimal()):
             return get_issueid_fromapi(issueowner, issuerepo, int(issuenumber))
         else:
             print(
@@ -187,7 +192,7 @@ def get_issueid_fromapi(issueowner, issuerepo, issuenumber):
                      params={},
                      headers=HEADERS)
 
-    if r.status_code == 404:
+    if r.status_code == 404 or r.status_code == 410:  # not found or "Gone"
         print(
             f'Potential subissue {issues_url} not found. Treating as normal item, not as subissue')
         return None
