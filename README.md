@@ -11,7 +11,7 @@ Caveats:
 
 ## Installation
 
-1. Install python 3.x and corresponding pip version
+1. Install **python 3.12** or newer and corresponding pip version
 2. `pip install -r requirements.txt`
 
 ## Usage
